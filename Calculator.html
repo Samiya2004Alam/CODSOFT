@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Pink Calculator</title>
+<style>
+  body {
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    height: 100vh;
+    background: #fce4ec; 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+  }
+  .calculator {
+    background: #f8bbd0; 
+    padding: 25px; 
+    border-radius: 20px; 
+    box-shadow: 0 8px 20px rgba(194,71,114,0.5);
+    width: 320px;
+  }
+  .display {
+    width: 100%; 
+    height: 60px; 
+    background: #880e4f; 
+    color: #fce4ec;
+    font-size: 2.2rem; 
+    text-align: right; 
+    padding: 10px 15px; 
+    border-radius: 15px;
+    margin-bottom: 25px; 
+    overflow-x: auto; 
+    user-select: none; 
+    font-weight: 600;
+    transition: box-shadow 0.3s ease;
+  }
+  .display.result {
+    box-shadow: 0 0 15px 4px #ad1457;
+  }
+  .buttons {
+    display: grid; 
+    grid-template-columns: repeat(4, 1fr); 
+    gap: 15px;
+  }
+  button {
+    padding: 22px; 
+    font-size: 1.4rem; 
+    border: none; 
+    border-radius: 15px;
+    background: #f48fb1; 
+    color: #880e4f; 
+    cursor: pointer; 
+    user-select: none;
+    font-weight: 600; 
+    box-shadow: 0 4px 12px rgba(244,143,177,0.6);
+    transition: background 0.3s ease, color 0.3s ease, transform 0.2s ease;
+  }
+  button:hover {
+    background: #ec407a; 
+    color: #fff0f6;
+    transform: scale(1.1);
+  }
+  button.operator {
+    background: #ad1457; 
+    color: #fce4ec; 
+    box-shadow: 0 4px 12px rgba(173,20,87,0.7);
+  }
+  button.operator:hover {
+    background: #880e4f; 
+    color: #fce4ec;
+  }
+  button.clear {
+    background: #f48fb1; 
+    color: #880e4f; 
+    grid-column: span 2;
+    box-shadow: 0 4px 12px rgba(244,143,177,0.7);
+  }
+  button.clear:hover {
+    background: #ec407a; 
+    color: #fff0f6;
+  }
+  button.equal {
+    background: #880e4f; 
+    color: #fce4ec; 
+    grid-column: span 2;
+    box-shadow: 0 4px 15px rgba(136,14,79,0.9);
+  }
+  button.equal:hover {
+    background: #ad1457; 
+    color: #fff0f6;
+  }
+</style>
+</head>
+<body>
+
+<div class="calculator">
+  <div class="display" id="display">0</div>
+  <div class="buttons">
+    <button class="clear" id="clear">C</button>
+    <button class="operator" data-op="/">÷</button>
+    <button class="operator" data-op="*">×</button>
+    <button class="operator" data-op="-">−</button>
+
+    <button data-num="7">7</button>
+    <button data-num="8">8</button>
+    <button data-num="9">9</button>
+    <button class="operator" data-op="+">+</button>
+
+    <button data-num="4">4</button>
+    <button data-num="5">5</button>
+    <button data-num="6">6</button>
+    <button class="equal" id="equal">=</button>
+
+    <button data-num="1">1</button>
+    <button data-num="2">2</button>
+    <button data-num="3">3</button>
+    <button data-num="0" style="grid-column: span 2;">0</button>
+    <button data-num=".">.</button>
+  </div>
+</div>
+
+<script>
+  const display = document.getElementById('display');
+  const buttons = document.querySelectorAll('button');
+  let currentInput = '';
+
+  buttons.forEach(button => {
+    button.addEventListener('click', () => {
+      const num = button.getAttribute('data-num');
+      const op = button.getAttribute('data-op');
+
+      if (button.id === 'clear') {
+        currentInput = '';
+        display.textContent = '0';
+        display.classList.remove('result');
+        return;
+      }
+
+      if (button.id === 'equal') {
+        try {
+          if (/[\+\-\*\/.]$/.test(currentInput)) {
+            currentInput = currentInput.slice(0, -1);
+          }
+          let result = eval(currentInput);
+          display.textContent = result;
+          currentInput = result.toString();
+
+          display.classList.add('result');
+          setTimeout(() => display.classList.remove('result'), 500);
+        } catch {
+          display.textContent = "Hmm... That's not right 😅";
+          currentInput = '';
+          display.classList.remove('result');
+        }
+        return;
+      }
+
+      if (num !== null) {
+        if (num === '.' && currentInput.endsWith('.')) return;
+
+        if (num === '.') {
+          const lastOpIndex = Math.max(
+            currentInput.lastIndexOf('+'),
+            currentInput.lastIndexOf('-'),
+            currentInput.lastIndexOf('*'),
+            currentInput.lastIndexOf('/')
+          );
+          const lastNumber = currentInput.substring(lastOpIndex + 1);
+          if (lastNumber.includes('.')) return;
+        }
+
+        currentInput += num;
+        display.textContent = currentInput;
+        display.classList.remove('result');
+      }
+
+      if (op !== null) {
+        if (currentInput === '') return;
+        if (/[\+\-\*\/]$/.test(currentInput)) {
+          currentInput = currentInput.slice(0, -1);
+        }
+        currentInput += op;
+        display.textContent = currentInput;
+        display.classList.remove('result');
+      }
+    });
+  });
+</script>
+
+</body>
+</html>
+
+
